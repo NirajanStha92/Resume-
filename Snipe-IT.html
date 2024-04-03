@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+</head>
+<body class="is-preload">
+        <div id="main">
+            <section class="post">
+            <h1>#Snipe-IT: Revolutionizing Asset Management</h1>
+            Snipe-IT is an open-source asset management software designed to help organizations efficiently track and manage IT assets. It provides a user-friendly interface for managing assets such as hardware, software, licenses, and accessories. With Snipe-IT, users can easily catalog assets, assign them to specific users or locations, track their movements, monitor maintenance schedules, and generate comprehensive reports.
+                <br>I was able to host it on my computer using Ubuntu Server in a VM and deploy it for test purposes. I want to share the experience of what I did to run the open-source system.
+                <h3>Setup</h3>
+                <b>Tools Used:</b>
+        <ul>
+            <li>VM</li>
+            <li>Ubuntu Server</li>
+            <li>NGINX</li>
+            <li>MySQL Server</li>
+            <li>PHP FPM</li>
+            <li>Snipe-IT</li>
+        </ul>
+
+        <h3>Setting Up:</h3>
+        <p>The setup for the VM and Ubuntu Server was standard with minimum resources. </p>
+        <ol>
+            <li>We Need to figure out if we want the static IP address or the DHCP address on the server, after figuring that we can set the IP address of the server. (Class of address)</li>
+            <li>If there is a proxy server in your gateway, the address should be placed when prompted. </li>
+            <img src="images/vm1.png">
+            <li>To run a headless server, we need to install the OpenSSH server. </li>
+            <img src="images/ssh Setup.png">
+            
+        </ol>
+
+        <h2>Security Measures</h2>
+        <ul>
+            <li>Update</li>
+            <li>Automate the updates by running: (Scripts)</li>
+            <li>APT is a powerful tool for handling the installation and removal of software. </li>
+            <ul>
+                <li>cd /etc/apt/apt.conf.d</li>
+                <li>In the 50unattended-upgrades file the security section should be uncommented as it allows for automatic updates. </li>
+                <img src="images/Unattended up.png">
+                <li>On the same file there is a code where the automatic reboot is false and we need to uncomment that and also the automatic reboot time. It can be found by using Ctrl+w to search. </li>
+                <ul>
+                    <li>Try to find Unattended-upgrade and read the content on how you want to configure the updates. </li>
+                    <li>The 20auto-upgrades will allow you to check if the updates are enabled or disabled.</li>
+                </ul>
+                <li>To check if the services are running or not through the systemctl command.</li>
+            </ul>
+            
+            <!-- other security measures go here -->
+        </ul>
+        <h2>Networking</h2>
+        <ul>
+            <li>The network configuration is stored in the 00-installer-config.yaml file located in etc/netplan.</li>
+            <ul>
+                <li>Configure to your network and apply it by using: sudo netplan apply.</li>
+            </ul>
+            <h4>Open SSH</h4>
+            <li>Need to install the open SSH connection to the host and the computer we are connecting from.</li>
+            <ul>
+                <li>Cmd: ssh hostname@IP_Address </li>
+            </ul>
+            <h4>Cockpit</h4>
+            <li>It allows access to the server from the local network to the browser. </li>
+            <ul>
+                <li>To configure the cockpit with the server we need to make adjustments in: </li>
+                <ul>
+                    <li>sudo nanp /etc/ netplan/00-installer-config.yaml</li>
+                    <img src="images/networkmanager.png">
+                    <li>This conf is used when the DHCP is set to give Ip address on its own. If there is a static IP the network section would look different for instance: </li>
+                    <img src="images/networkmanager2.png">
+                </ul>
+                <p class=MsoListParagraphCxSpMiddle style='margin-left:2.5in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span><img width=249 height=203
+                    src="SnipeIT%20Documentation_files/image005.jpg"></p>
+                    
+                    <p class=MsoListParagraphCxSpLast style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>To apply the config: <b>sudo netplan try</b></p>
+                    
+                    (NOTE: Turn on the Bridge Adapter of the VM)
+                        <img  src="SnipeIT%20Documentation_files/image006.jpg"></p>
+                    
+                    <b>Install NGINX, MySQL, PHP and PHP FPM </b>
+                    
+                    <p>Nginx is a web server that can also be used as a reverse
+                    proxy, load balancer, mail proxy, and HTTP cache.</p>
+                    
+                    <span style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>sudo apt install nginx
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:.75in;text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>sudo apt install mysql-server</p>
+                    
+                    <p class=MsoListParagraphCxSpLast style='text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>Install PHP</p>
+                    
+                    <p class=MsoNormal>PHP &gt;= 7.4 &lt; v8.1.2 is required on the server. </p>
+                    
+                    <p class=MsoListParagraph style='text-indent:-.25in'><span style='font-family:
+                    Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>Install PHP FPM.</p>
+                    
+                    <p class=MsoNormal>It’s an efficient method to process dynamic content on your
+                    website, providing a significant speed boost. It maintains pools (workers ready
+                    to serve&nbsp;<a
+                    href="https://www.cloudways.com/blog/top-ide-and-code-editors-php-development/"
+                    target="_blank">PHP code</a>) to accomplish this. These persistent PHP
+                    processes can serve queries instantly without any delay in initializing the PHP
+                    process. This speeds up your PHP environment and, eventually, your web
+                    applications.</p>
+                    
+                    <p class=MsoListParagraphCxSpFirst style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>sudo add-apt-repository universe</p>
+                    
+                    <p class=MsoListParagraphCxSpLast style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>sudo apt install php-fpm php-mysql</p>
+                    
+                    
+                    
+                    <p class=MsoNormal>This command allows to install everything in a bulk. </p>
+                    <ul>
+                        <li>apt install php8.1 {bcmath,common,ctype,curl,fileinfo,fpm,gd,iconv,intl,mbstring,mysql,soap,xml,xsl,zip,cli}</li>    
+                    </ul>
+                    
+                    
+                    <p class=MsoNormal>To verify the installation, we have to browse to the IP
+                    address of the server and get the NGINX generic web page. </p>
+                    
+                    <p class=MsoNormal><img src="SnipeIT%20Documentation_files/image007.jpg"></p>
+                    
+                    <p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>Create a new site and test PHP </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>Now we have to create a site for Snipe-IT, which is going to
+                    disable the default site</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>sudo nano /etc/nginx/sites-available/ams.teknex.com.au</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>We are creating a file that will contain the script of the server
+                    which is going to look for the index of the website and php. </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span><img src="SnipeIT%20Documentation_files/image008.jpg"></p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>sudo ln -s /etc/nginx/sites-available/ams.teknex.com.au
+                    /etc/nginx/sites-enabled/</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>Disable the default site </p>
+                    
+                    <p class=MsoListParagraphCxSpLast style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>sudo unlink /etc/nginx/sites-enabled/default</p>
+                    
+                    <p class=MsoNormal>After the installation is done, please restart the NGINX
+                    service.</p>
+                    
+                    <p class=MsoListParagraphCxSpFirst style='margin-left:.75in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>Sudo service nginx restart </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.25in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>PHP: Create a simple PHP page and browse to IP of the localhost </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.75in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>sudo bash -c &quot;echo -e '&lt;?php\nphpinfo();\n?&gt;' &gt;
+                    /var/www/html/phpinfo.php&quot;</p>
+                    
+                    <p class=MsoListParagraphCxSpLast style='margin-left:1.5in'><img  src="SnipeIT%20Documentation_files/image009.jpg"></p>
+                    
+                    <p class=MsoNormal>(NOTE: Please do not proceed further if you do not see the
+                    PHP page)</p>
+                    
+                    <p class=MsoNormal><b>Commands to Check if the installation is in the system
+                    and active. </b></p>
+                    
+                    <p class=MsoListParagraphCxSpFirst style='margin-left:1.25in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>sudo service mysql status</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.25in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>sudo php –version </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.25in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>sudo mysql -V</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.25in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>sudo nginx -V</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.25in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>sudo php –version </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>Create an initial database and user </p>
+                    
+                    <table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0
+                     style='margin-left:1.0in;border-collapse:collapse;border:none'>
+                     <tr>
+                      <td width=360 valign=top style='width:269.75pt;border:solid windowtext 1.0pt;
+                      padding:0in 5.4pt 0in 5.4pt'>
+                      <p class=MsoListParagraphCxSpMiddle style='margin:0in;text-indent:0in;
+                      line-height:normal'><span style='font-family:"Courier New"'>o<span
+                      style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      </span></span>Database</p>
+                      </td>
+                      <td width=360 valign=top style='width:269.75pt;border:solid windowtext 1.0pt;
+                      border-left:none;padding:0in 5.4pt 0in 5.4pt'>
+                      <p class=MsoListParagraphCxSpLast style='margin:0in;text-indent:0in;
+                      line-height:normal'><span style='font-family:"Courier New"'>o<span
+                      style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      </span></span><b>Snipeit_db</b></p>
+                      </td>
+                     </tr>
+                     <tr>
+                      <td width=360 valign=top style='width:269.75pt;border:solid windowtext 1.0pt;
+                      border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+                      <p class=MsoListParagraphCxSpFirst style='margin:0in;text-indent:0in;
+                      line-height:normal'><span style='font-family:"Courier New"'>o<span
+                      style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      </span></span>User</p>
+                      </td>
+                      <td width=360 valign=top style='width:269.75pt;border-top:none;border-left:
+                      none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+                      padding:0in 5.4pt 0in 5.4pt'>
+                      <p class=MsoListParagraphCxSpLast style='margin:0in;text-indent:0in;
+                      line-height:normal'><span style='font-family:"Courier New"'>o<span
+                      style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      </span></span>Snipeit_user</p>
+                      </td>
+                     </tr>
+                     <tr>
+                      <td width=360 valign=top style='width:269.75pt;border:solid windowtext 1.0pt;
+                      border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+                      <p class=MsoListParagraphCxSpFirst style='margin:0in;text-indent:0in;
+                      line-height:normal'><span style='font-family:"Courier New"'>o<span
+                      style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      </span></span>Password</p>
+                      </td>
+                      <td width=360 valign=top style='width:269.75pt;border-top:none;border-left:
+                      none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+                      padding:0in 5.4pt 0in 5.4pt'>
+                      <p class=MsoListParagraphCxSpLast style='margin:0in;text-indent:0in;
+                      line-height:normal'><span style='font-family:"Courier New"'>o<span
+                      style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      </span></span>---------------</p>
+                      </td>
+                     </tr>
+                    </table>
+                    
+                    <p class=MsoListParagraphCxSpFirst style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>sudo mysql -u root -p</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>The database will open and enter the following command as the
+                    table. </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>Create DATABASE <b>Snipeit_db;</b></p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>Create User ‘Snipeit_user’@‘localhost’ IDENTIFIED BY ‘Password’;</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>GRANT ALL PRIVILEGES ON Snipeit_db.* TO
+                    ‘‘Snipeit_user’@‘localhost’;</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:2.0in;text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>To verify permission </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>Show Grants For ‘Snipeit_user’@‘localhost’;</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>Flush privileges; </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>Quit</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>Sudo service mysql status (make sure it is active and running) </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>Install Snipe-IT</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>The working directory will be /var/www/html</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>Clone the Snipe-IT in that directory.</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>sudo git clone <a href="https://github.com/snipe/snipe-it">https://github.com/snipe/snipe-it</a>
+                    snipe-it</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>If the command returns an error,</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>apt install git -y</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>Now we have to <b>go to the Snipe-IT directory</b> copy the
+                    .env.example configuration file to .env and modify the content. </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>cp .env.example .env</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>Open the .env fine that we copied with nano. </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>nano .env</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:2.0in;text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>APP_URL=IP of the host/ http://snipeit.yourdomain.com<br>
+                    APP_TIMEZONE='America/New_York'</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:2.0in;text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>DB_DATABASE=Snipeit</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:2.0in;text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>DB_USERNAME=Snipeit</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:2.0in;text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>DB_PASSWORD=</p>
+                    
+                    <p class=MsoListParagraphCxSpLast style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span><img 
+                    src="SnipeIT%20Documentation_files/image010.jpg"></p>
+                    
+                    <p class=MsoNormal>(Note: Use the configuration name from the table above)</p>
+                    
+                    <p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>To change the mail settings in the .env file; </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>MAIL_HOST=smtp.gmail.com</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>MAIL_PORT=587</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>MAIL_ENCRYPTON=TLS (or SSL depending on port)</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>Now we have changed the permission of the folder of the Snipe-IT
+                    directory. </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>Cd /var/www/html/snipeit</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>sudo chown -R www-data:www-data /var/www/snipeit/</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>sudo chmod -R 755 storage </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>sudo chmod -R 755 public/upoads</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>Download, Install and configure Composer. </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>Composer is a tool for dependency management in PHP. It allows
+                    you to declare the libraries your project depends on and it will manage
+                    (install/update) them for you.</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>To manage Snipe-IT components and their dependencies we are going
+                    to use Composer. </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:2.0in;text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>curl -sS https://getcomposer.org/installer -o composer-setup.php</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:2.0in;text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>php composer-setup.php --install-dir=/usr/local/bin
+                    --filename=composer</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:2.0in;text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>composer update --no-plugins --no-scripts</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:2.0in;text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>composer install --no-dev --prefer-source --no-plugins
+                    --no-scripts</p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>Generate App Key for .env file </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>First enter the value that needs to be changed in the .env file,
+                    otherwise the keys will not be generated. </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.0in;text-indent:-.25in'><span
+                    style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+                    </span></span>sudo  php artisan key:generate </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='margin-left:1.5in;text-indent:-.25in'><span
+                    style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+                    </span></span>To check the key open .env file and check the APP_Key value. </p>
+                    
+                    <p class=MsoListParagraphCxSpMiddle style='text-indent:-.25in'><span
+                    style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span></span>Now restart all the services or reboot the system and be ready
+                    for Snipe-IT pre-flight setup. </p>
+                    
+                    <p class=MsoListParagraphCxSpLast><img  src="SnipeIT%20Documentation_files/image011.gif"></p>
+                    
+                    <h2>Experience</h2>
+                    
+                    <p class=MsoNormal>Setting up a dedicated server in the network and
+                    implementing a comprehensive system for managing the organization's assets is a
+                    step forward in streamlining bookkeeping processes. Transitioning from Excel
+                    spreadsheets to an open-source inventory management system brings many benefits
+                    that not only enhance efficiency but also empower IT professionals with greater
+                    control and oversight.</p>
+                    
+                    <p class=MsoNormal>The decision to migrate to an open-source inventory
+                    management system is indeed rewarding, as it increases the visibility of how
+                    assets are monitored and managed within the organization. By moving away from
+                    Excel, which often presents challenges in maintaining accuracy and
+                    accessibility, the new system promises to offer heightened visibility into the
+                    organization's assets. This heightened visibility enables IT professionals to
+                    track assets in real time, providing insights into their location, usage
+                    patterns, and status.</p>
+                    
+                    <p class=MsoNormal>One of the key advantages of having such visibility over
+                    assets is the ability to ensure compliance with regulatory requirements and
+                    internal policies. As an IT professional, compliance is foremost, and having
+                    accurate and up-to-date records of assets is crucial in meeting regulatory
+                    standards. Furthermore, the ability to closely monitor assets reduces the risk
+                    of non-compliance and associated penalties. Additionally, the system's robust
+                    tracking capabilities play a vital role in mitigating risks such as loss,
+                    theft, or damage, by allowing for timely interventions and security measures.</p>
+                    
+                    <p class=MsoNormal>Moreover, the transition to the open-source inventory
+                    management system aligns perfectly to maintain a secure network infrastructure.
+                    By implementing this system, IT professionals can establish secure servers and
+                    network configurations to safeguard sensitive asset data. This not only
+                    protects the organization's assets but also bolsters overall cybersecurity
+                    measures, ensuring that the network remains resilient against potential threats
+                    and vulnerabilities.</p>
+                    
+            </ul>
+                
+        </ul>
+        <p>
+            <a href="https://snipe-it.readme.io/docs/introduction">
+              <p> Reference:</p> 
+               https://snipe-it.readme.io/docs/introduction
+            </a>
+        </p>
+        <ul class="actions special">
+            <li><a href="index.html" class="button">Back to Home</a></li>
+        </ul>
+
+        <!-- other sections of the article go here -->
+    </section>
+    </div>
+</body>
+</html>
